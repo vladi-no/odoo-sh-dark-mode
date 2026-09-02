@@ -228,7 +228,7 @@ body .btn-light:hover {
 }
 body .btn-light.disabled,
 body .btn-light:disabled {
-  color: var(--sh-text-muted) !important;
+  color: var(--sh-text-soft) !important;
   background-color: var(--sh-bg-2) !important;
 }
 body .btn-dark {
