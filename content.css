@@ -1,0 +1,448 @@
+/* ==========================================================================
+   Odoo.sh Dark Mode
+   Targets Odoo.sh's actual Bootstrap 5 + custom "sh-*" / "o_*" classes
+   instead of relying on a generic invert/filter approach.
+   ========================================================================== */
+
+:root {
+  --sh-bg-0: #16181d;   /* deepest background (was bg-white / body) */
+  --sh-bg-1: #1c1f26;   /* panels (was bg-100) */
+  --sh-bg-2: #23262e;   /* toolbars (was bg-200) */
+  --sh-bg-3: #2b2f39;   /* elevated / cards (was bg-300) */
+  --sh-bg-4: #333844;   /* hovered / active rows */
+
+  --sh-blue-darker: #0a0e15; /* was sh-bg-blue-darker */
+  --sh-blue-dark:   #10141c; /* was sh-bg-blue-dark */
+  --sh-blue:        #171c26; /* was sh-bg-blue (branch rows, tab bar) */
+  --sh-blue-hover:  #202634;
+
+  --sh-border: #383d48;
+  --sh-border-soft: #2a2e37;
+
+  --sh-text: #e7e6e3;
+  --sh-text-soft: #b8bcc4;
+  --sh-text-muted: #868c98;
+
+  --sh-link: #7aa2f7;
+  --sh-link-hover: #9dbdfb;
+
+  --sh-success: #4ade80;
+  --sh-warning: #fbbf24;
+  --sh-danger:  #f87171;
+  --sh-info:    #60c5f1;
+}
+
+/* ---- Base ---------------------------------------------------------- */
+
+html, body.odoo_sh_app_body {
+  background-color: var(--sh-bg-0) !important;
+  color: var(--sh-text) !important;
+  color-scheme: dark;
+}
+
+body.odoo_sh_app_body,
+.paas-app, .odoo_sh, .odoo_sh_app {
+  background-color: var(--sh-bg-0) !important;
+}
+
+* {
+  scrollbar-color: #4a505d var(--sh-bg-1);
+}
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--sh-bg-1); }
+::-webkit-scrollbar-thumb { background-color: #4a505d; border-radius: 8px; border: 3px solid var(--sh-bg-1); }
+::-webkit-scrollbar-thumb:hover { background-color: #5c6373; }
+
+a { color: var(--sh-link); }
+a:hover { color: var(--sh-link-hover); }
+
+hr { border-color: var(--sh-border); }
+
+/* ---- Header / top navbar ------------------------------------------- */
+
+header .navbar.navbar-dark {
+  background-color: var(--sh-blue-darker) !important;
+  border-bottom: 1px solid var(--sh-border-soft);
+}
+header .navbar .nav-link,
+header .navbar samp,
+header .navbar span,
+header .navbar b {
+  color: var(--sh-text) !important;
+}
+header .navbar .nav-link:hover {
+  color: var(--sh-link) !important;
+}
+
+/* ---- Odoo.sh "sh-bg-*" custom classes ------------------------------ */
+
+.sh-bg-blue-darker { background-color: var(--sh-blue-darker) !important; }
+.sh-bg-blue-dark    { background-color: var(--sh-blue-dark) !important; }
+.sh-bg-blue         { background-color: var(--sh-blue) !important; }
+
+.sh-bg-blue-dark .text-white,
+.sh-bg-blue-darker .text-white,
+.sh-bg-blue .text-white,
+.sh-bg-blue-dark h4,
+.sh-bg-blue-dark h6 {
+  color: var(--sh-text) !important;
+}
+
+/* Branch list rows / hover / active state */
+.o_branch a,
+.o_paas_branch a {
+  color: var(--sh-text) !important;
+}
+li.o_branch:hover,
+li.o-draggable:hover {
+  background-color: var(--sh-blue-hover) !important;
+}
+li.o_branch.active,
+li.o-draggable.active {
+  background-color: var(--sh-bg-4) !important;
+  box-shadow: inset 3px 0 0 var(--sh-link);
+}
+.o_branch_icon.o_branch_success i { color: var(--sh-success) !important; }
+.o_branch_icon.o_branch_warning i { color: var(--sh-warning) !important; }
+.o_branch_icon.o_branch_danger i,
+.o_branch_icon.o_branch_error i { color: var(--sh-danger) !important; }
+
+/* Stage headers (Production / Staging / Development) */
+.o_stage { color: var(--sh-text-soft) !important; }
+.o_stage .gi { color: var(--sh-text-soft) !important; }
+
+/* Branch search bar - no background in the original light theme either,
+   it should just blend into the sidebar like the rest of the row. */
+.o_branches_searchbar input.form-control {
+  background-color: transparent !important;
+  color: var(--sh-text) !important;
+  border-color: var(--sh-border) !important;
+}
+.o_branches_searchbar input::placeholder { color: var(--sh-text-muted) !important; }
+/* The icon's own container div gets an explicit background-color: #22262C
+   from Odoo.sh's own CSS (a dark-but-not-quite-black shade our generic
+   sweep doesn't flag), which read as a mismatched square once everything
+   around it moved to our darker palette. */
+.o_branches_searchbar_icon { background-color: transparent !important; }
+/* Magnifier icon - sits directly on the dark sidebar bg, not the input, so
+   the generic .text-muted rule reads too dim there; brighten it specifically.
+   Covers ::before too in case the glyph color isn't inherited from the host. */
+.o_branches_searchbar_icon i,
+.o_branches_searchbar_icon i::before,
+.o_branches_searchbar_icon .gi,
+.o_branches_searchbar_icon .gi::before {
+  color: var(--sh-text) !important;
+  background-color: transparent !important;
+  opacity: 1 !important;
+}
+
+/* ---- Generic Bootstrap background utilities Odoo.sh reuses --------- */
+
+body .bg-white {
+  background-color: var(--sh-bg-1) !important;
+  color: var(--sh-text) !important;
+}
+body .bg-100 { background-color: var(--sh-bg-1) !important; }
+body .bg-200 { background-color: var(--sh-bg-2) !important; }
+body .bg-300 { background-color: var(--sh-bg-3) !important; }
+
+body .text-white  { color: var(--sh-text) !important; }
+body .text-muted  { color: var(--sh-text-muted) !important; }
+body .text-500,
+body .text-dark   { color: var(--sh-text-soft) !important; }
+body .text-success { color: var(--sh-success) !important; }
+body .text-warning { color: var(--sh-warning) !important; }
+body .text-danger  { color: var(--sh-danger) !important; }
+body .text-info    { color: var(--sh-info) !important; }
+
+/* ---- Main branch panel / header ------------------------------------ */
+
+.o_branch_main_view { background-color: var(--sh-bg-1) !important; }
+.o_branch_header.sh-bg-blue-dark { background-color: var(--sh-blue-dark) !important; }
+.o_branch_header_bottom.sh-bg-blue { background-color: var(--sh-blue) !important; }
+
+.o_branch_header_bottom a,
+.o_branch_header_bottom li {
+  color: var(--sh-text-soft) !important;
+}
+.o_branch_header_bottom li.active a,
+.o_branch_header_bottom a.active {
+  color: var(--sh-text) !important;
+  border-bottom-color: var(--sh-link) !important;
+}
+
+/* Clone / Fork / Merge / SSH / SQL / Submodule / Delete button bar */
+.o_branch_buttons .btn {
+  color: var(--sh-text-soft) !important;
+  background-color: transparent !important;
+  border-color: var(--sh-border) !important;
+}
+.o_branch_buttons .btn.active,
+.o_branch_buttons .btn:hover {
+  color: var(--sh-text) !important;
+  background-color: var(--sh-bg-3) !important;
+}
+
+body .o_git_command input.js_git_command {
+  background-color: var(--sh-bg-2) !important;
+  color: var(--sh-text) !important;
+}
+
+/* Copy-to-clipboard button next to the git command: it ships as
+   btn.btn-light.bg-300, both of which are utility classes that can carry
+   their own !important in Odoo's Bootstrap build. The extra "body"
+   ancestor + full class chain below raises specificity so our override
+   reliably wins the tie. */
+body .btn.o_clipboard_button,
+body .btn.btn-light.o_clipboard_button,
+body .btn.bg-300.o_clipboard_button {
+  background-color: var(--sh-bg-2) !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text-soft) !important;
+}
+body .btn.o_clipboard_button:hover {
+  background-color: var(--sh-bg-4) !important;
+  color: var(--sh-text) !important;
+}
+body .o_clipboard_button .fa,
+body .o_clipboard_button .gi {
+  color: inherit !important;
+}
+
+/* ---- Toolbars (Rebuild / GitHub, etc.) ------------------------------ */
+
+nav.navbar.bg-200 {
+  background-color: var(--sh-bg-2) !important;
+  border-color: var(--sh-border) !important;
+}
+
+/* ---- Buttons --------------------------------------------------------- */
+
+body .btn-light {
+  background-color: var(--sh-bg-3) !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text) !important;
+}
+body .btn-light:hover {
+  background-color: var(--sh-bg-4) !important;
+}
+body .btn-light.disabled,
+body .btn-light:disabled {
+  color: var(--sh-text-muted) !important;
+  background-color: var(--sh-bg-2) !important;
+}
+body .btn-dark {
+  background-color: var(--sh-bg-2) !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text) !important;
+}
+body .btn-success {
+  background-color: #1c7a4d !important;
+  border-color: #1c7a4d !important;
+  color: #eafff2 !important;
+}
+body .btn-success:hover { background-color: #22935d !important; }
+
+/* ---- Forms ------------------------------------------------------------ */
+
+body .form-control,
+body .form-select {
+  background-color: var(--sh-bg-2) !important;
+  color: var(--sh-text) !important;
+  border-color: var(--sh-border) !important;
+}
+body .form-control::placeholder { color: var(--sh-text-muted) !important; }
+body .form-control:focus,
+body .form-select:focus {
+  background-color: var(--sh-bg-2) !important;
+  color: var(--sh-text) !important;
+  border-color: var(--sh-link) !important;
+  box-shadow: 0 0 0 0.2rem rgba(122,162,247,0.25) !important;
+}
+body .form-select option { background-color: var(--sh-bg-2); color: var(--sh-text); }
+body label, body .col-form-label { color: var(--sh-text-soft) !important; }
+
+/* ---- Cards / panels ---------------------------------------------------- */
+
+.card {
+  background-color: var(--sh-bg-2) !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text) !important;
+}
+
+/* Build status cards (Builds page): Odoo.sh colors these via
+   `.o_builds_card.o_success{background:#28a745}` etc. (not !important), which
+   the blanket `.card` rule above was silently winning against since ours is
+   !important and theirs isn't - wiping out every success/failed/warning/
+   dropped color. Restoring the color as a background alone wouldn't be
+   visible though: the inner .card-body/.o_card_footer children get their own
+   background from Odoo's CSS (rgba(255,255,255,.9)), which content.js's
+   generic sweep correctly forces fully opaque and dark with no gap left for
+   the outer color to peek through - so use a border ring instead, which
+   draws at the card's own edge and isn't covered by child backgrounds.
+   Uses the same --sh-success/--sh-danger/--sh-warning palette as the rest
+   of the theme (softer, desaturated tones) rather than Odoo's raw Bootstrap
+   primitives (#28a745/#900/#e28900), which read as neon against a dark
+   card; .o_dropped uses --sh-text-muted since it's an inactive/archived
+   state, not really a "color" in its own right. */
+.o_builds_card.o_success {
+  border-color: var(--sh-success) !important;
+  box-shadow: inset 0 0 0 2px var(--sh-success) !important;
+}
+.o_builds_card.o_failed {
+  border-color: var(--sh-danger) !important;
+  box-shadow: inset 0 0 0 2px var(--sh-danger) !important;
+}
+.o_builds_card.o_warning {
+  border-color: var(--sh-warning) !important;
+  box-shadow: inset 0 0 0 2px var(--sh-warning) !important;
+}
+.o_builds_card.o_dropped {
+  border-color: var(--sh-text-muted) !important;
+  box-shadow: inset 0 0 0 2px var(--sh-text-muted) !important;
+}
+
+/* ---- History / tracking timeline -------------------------------------- */
+
+body .o_branch_history.bg-100 { background-color: var(--sh-bg-1) !important; }
+
+body .o_tracking.list-group-item {
+  background-color: var(--sh-bg-2) !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text) !important;
+  box-shadow: none !important;
+}
+body .o_tracking_date { color: var(--sh-text-muted) !important; }
+body .o_tracking_commit.list-group-item.bg-100,
+body .o_tracking_commit.bg-100 {
+  background-color: var(--sh-bg-3) !important;
+  color: var(--sh-text-soft) !important;
+}
+body .o_tracking_commit:hover {
+  background-color: var(--sh-bg-4) !important;
+}
+/* Short commit hash - text-muted reads too low-contrast here for a monospace
+   identifier people actually need to read, same reasoning as the timestamp fix below. */
+body .o_tracking_commit_url { color: var(--sh-text) !important; }
+body .o_tracking_commit_msg { color: var(--sh-text-soft) !important; }
+body .o_tracking_commits_more_link { color: var(--sh-link) !important; }
+
+/* Timestamp ("33 minutes ago", etc.) - was too low-contrast as plain text-muted */
+body .o_tracking_info small.text-muted,
+body .o_tracking_info small.text-muted.fw-bold,
+body small.text-muted.fw-bold {
+  color: var(--sh-text-soft) !important;
+}
+
+/* The circle/icon marker on each timeline entry: the actual icon glyph
+   (.gi-git-commit) already gets its own dark fill from content.js's generic
+   sweep. Giving this OUTER wrapper a different shade of its own created a
+   visible seam around the icon that read as flanking squares - so leave
+   this one transparent and let the icon's own background be the only fill. */
+body .o_tracking_stage_change_box {
+  background-color: transparent !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text-soft) !important;
+  box-shadow: none !important;
+}
+body .o_sh_tracking_icon,
+body .o_sh_tracking_icon *,
+body .o_sh_tracking_history {
+  border-color: var(--sh-border) !important;
+  box-shadow: none !important;
+}
+/* The actual connecting line between timeline nodes: Odoo.sh's own CSS is
+   `.o_sh_tracking_history:before{content:""; width:2px; background:#e7e9ed;}`
+   - a real element that needs a background override (not a border), unlike
+   the other pseudo-element selectors this used to also list, none of which
+   have a `content` set anywhere in Odoo's CSS and so never render at all. */
+body .o_sh_tracking_history::before {
+  background-color: var(--sh-border) !important;
+  border-color: var(--sh-border) !important;
+}
+
+.o_history_status .btn-success {
+  background-color: #1c7a4d !important;
+  border-color: #1c7a4d !important;
+}
+/* "Test: Success" label - the "Test:" part is plain .text-muted, too dim
+   next to the bright .text-success "Success" beside it. */
+.o_history_status .text-muted { color: var(--sh-text-soft) !important; }
+
+/* ---- Pagination --------------------------------------------------------- */
+
+.pagination .page-link {
+  background-color: var(--sh-bg-2) !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text-soft) !important;
+}
+.pagination .page-item.active .page-link {
+  background-color: var(--sh-link) !important;
+  border-color: var(--sh-link) !important;
+  color: #0e1520 !important;
+}
+.pagination .page-item.disabled .page-link {
+  color: var(--sh-text-muted) !important;
+  background-color: var(--sh-bg-1) !important;
+}
+
+/* ---- Tooltips / dropdowns (Bootstrap, dynamically inserted) ------------- */
+
+.tooltip .tooltip-inner {
+  background-color: var(--sh-bg-3) !important;
+  color: var(--sh-text) !important;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+}
+.bs-tooltip-right .arrow::before,
+.bs-tooltip-end .tooltip-arrow::before { border-right-color: var(--sh-bg-3) !important; }
+.bs-tooltip-left .arrow::before,
+.bs-tooltip-start .tooltip-arrow::before { border-left-color: var(--sh-bg-3) !important; }
+.bs-tooltip-top .arrow::before,
+.bs-tooltip-top .tooltip-arrow::before { border-top-color: var(--sh-bg-3) !important; }
+.bs-tooltip-bottom .arrow::before,
+.bs-tooltip-bottom .tooltip-arrow::before { border-bottom-color: var(--sh-bg-3) !important; }
+
+.dropdown-menu {
+  background-color: var(--sh-bg-3) !important;
+  border-color: var(--sh-border) !important;
+  color: var(--sh-text) !important;
+}
+.dropdown-item {
+  color: var(--sh-text-soft) !important;
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--sh-bg-4) !important;
+  color: var(--sh-text) !important;
+}
+.dropdown-divider { border-color: var(--sh-border) !important; }
+
+/* ---- Shadows (Bootstrap's default shadow is tuned for light bg) -------- */
+
+.shadow, .shadow-lg {
+  box-shadow: 0 4px 14px rgba(0,0,0,0.45) !important;
+}
+
+/* ---- Code / monospace / logs -------------------------------------------- */
+
+.font-monospace,
+code, pre {
+  background-color: var(--sh-bg-2) !important;
+  color: var(--sh-text) !important;
+}
+
+/* ---- Odoo icon font tint (gi- / fa icons default to inherited color) --- */
+
+.gi, .fa {
+  color: inherit;
+}
+
+/* ---- Misc small helpers used across pages ------------------------------- */
+
+.border, .border-top, .border-bottom, .border-start, .border-end {
+  border-color: var(--sh-border) !important;
+}
+.list-unstyled, ul.list-group { background-color: transparent !important; }
+
+/* Avoid a white flash before the stylesheet paints on slow connections */
+html { background-color: var(--sh-bg-0); }
