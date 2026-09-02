@@ -40,28 +40,24 @@ Confirmed working (checked against real page HTML, not just guessed):
   own status colors get fully covered by the card's own opaque content
 - **Settings** (both the branch-level and project-level pages) — list groups
   (GitHub repo links, collaborator rows)
+- **Status** — the alert banner (all Bootstrap alert variants: success/
+  danger/warning/info), which had the same washed-out-color problem as the
+  Builds cards and is fixed the same way
 - Generic: buttons, form inputs/selects, cards, dropdowns, tooltips,
   scrollbars
 
-## What will likely need a follow-up pass
+## Out of scope
 
-Not yet checked against real page HTML:
-
-- **Monitor** — usually has charts (CPU/memory/response time graphs). If
-  those are rendered as `<canvas>` (Chart.js-style), the chart itself
-  won't recolor from CSS alone — the library bakes colors into the pixels.
-- **Shell** — often an embedded terminal (e.g. xterm.js), which manages
-  its own color scheme separately from the page CSS.
-- **Logs** — plain-text log viewer; likely fine with the generic
-  `bg-white`/`font-monospace` overrides already included, but worth checking.
-- **Backups** / **Upgrade** / **Tools** — probably use the same Bootstrap
-  classes already covered, but may have page-specific bits.
-
-The most reliable way to fix a page: in Chrome, **File → Save Page As →
-Webpage, Complete** (not just "copy outerHTML") - that saves the actual
-linked CSS/JS files alongside the HTML, which is what let earlier fixes here
-target Odoo.sh's real stylesheet rules instead of guessing at what might be
-overriding them.
+**Monitor**, **Shell**, **Logs**, **Backups**, **Upgrade**, **Tools** are
+intentionally not covered - not used, so not worth the maintenance cost of
+fixing pages nobody looks at. If that changes, the most reliable way to fix
+a page: in Chrome, **File → Save Page As → Webpage, Complete** (not just
+"copy outerHTML") - that saves the actual linked CSS/JS files alongside the
+HTML, which is what let every fix in this repo target Odoo.sh's real
+stylesheet rules instead of guessing at what might be overriding them. Worth
+noting for Monitor specifically: if its charts render as `<canvas>`
+(Chart.js-style), the chart itself won't recolor from CSS alone regardless -
+the library bakes colors into the pixels.
 
 ## Tuning colors
 
