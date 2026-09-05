@@ -444,5 +444,20 @@ code, pre {
 }
 .list-unstyled, ul.list-group { background-color: transparent !important; }
 
+/* ---- Shell tab (JupyterLab-based webshell) -----------------------------
+   Served in an <iframe class="o_sh_iframe_tab"> pointing at
+   https://<project>.dev.odoo.com/odoo-sh/webshell - a different host than
+   odoo.sh itself, which manifest.json now also matches (scoped to the
+   /odoo-sh/ path only, so it never touches the actual Odoo app on that
+   same host). */
+body.jp-ThemedContainer {
+  background-color: var(--sh-bg-1) !important;
+  color: var(--sh-text) !important;
+}
+.lm-Widget,
+.lm-DockPanel {
+  background-color: var(--sh-bg-1) !important;
+}
+
 /* Avoid a white flash before the stylesheet paints on slow connections */
 html { background-color: var(--sh-bg-0); }

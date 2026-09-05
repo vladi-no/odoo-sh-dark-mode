@@ -22,7 +22,8 @@
     {
       "matches": [
         "https://*.odoo.sh/*",
-        "https://www.odoo.sh/*"
+        "https://www.odoo.sh/*",
+        "https://*.odoo.com/odoo-sh/*"
       ],
       "js": ["content.js"],
       "run_at": "document_start",
@@ -34,7 +35,8 @@
       "resources": ["content.css"],
       "matches": [
         "https://*.odoo.sh/*",
-        "https://www.odoo.sh/*"
+        "https://www.odoo.sh/*",
+        "https://*.odoo.com/*"
       ]
     }
   ]
