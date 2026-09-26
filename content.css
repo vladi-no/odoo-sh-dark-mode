@@ -111,22 +111,21 @@ li.o-draggable.active {
 .o_stage { color: var(--sh-text-soft) !important; }
 .o_stage .gi { color: var(--sh-text-soft) !important; }
 
-/* Branch search bar - no background in the original light theme either,
-   it should just blend into the sidebar like the rest of the row. */
+/* Branch search bar: no background, it blends into the sidebar like the
+   rest of the row (same as the original light theme). */
 .o_branches_searchbar input.form-control {
   background-color: transparent !important;
   color: var(--sh-text) !important;
   border-color: var(--sh-border) !important;
 }
 .o_branches_searchbar input::placeholder { color: var(--sh-text-muted) !important; }
-/* The icon's own container div gets an explicit background-color: #22262C
-   from Odoo.sh's own CSS (a dark-but-not-quite-black shade our generic
-   sweep doesn't flag), which read as a mismatched square once everything
-   around it moved to our darker palette. */
+/* The icon's container div has background-color: #22262C in Odoo.sh's CSS,
+   a shade the generic sweep doesn't flag, which shows up as a mismatched
+   square on the darker palette. */
 .o_branches_searchbar_icon { background-color: transparent !important; }
-/* Magnifier icon - sits directly on the dark sidebar bg, not the input, so
-   the generic .text-muted rule reads too dim there; brighten it specifically.
-   Covers ::before too in case the glyph color isn't inherited from the host. */
+/* Magnifier icon: it sits on the dark sidebar, not the input, where the
+   generic .text-muted color is too dim. Covers ::before too in case the
+   glyph color isn't inherited. */
 .o_branches_searchbar_icon i,
 .o_branches_searchbar_icon i::before,
 .o_branches_searchbar_icon .gi,
@@ -191,8 +190,7 @@ body .o_git_command input.js_git_command {
 /* Copy-to-clipboard button next to the git command: it ships as
    btn.btn-light.bg-300, both of which are utility classes that can carry
    their own !important in Odoo's Bootstrap build. The extra "body"
-   ancestor + full class chain below raises specificity so our override
-   reliably wins the tie. */
+   ancestor and full class chain raise specificity so this override wins. */
 body .btn.o_clipboard_button,
 body .btn.btn-light.o_clipboard_button,
 body .btn.bg-300.o_clipboard_button {
@@ -270,21 +268,15 @@ body label, body .col-form-label { color: var(--sh-text-soft) !important; }
   color: var(--sh-text) !important;
 }
 
-/* Build status cards (Builds page): Odoo.sh colors these via
-   `.o_builds_card.o_success{background:#28a745}` etc. (not !important), which
-   the blanket `.card` rule above was silently winning against since ours is
-   !important and theirs isn't - wiping out every success/failed/warning/
-   dropped color. Restoring the color as a background alone wouldn't be
-   visible though: the inner .card-body/.o_card_footer children get their own
-   background from Odoo's CSS (rgba(255,255,255,.9)), which content.js's
-   generic sweep correctly forces fully opaque and dark with no gap left for
-   the outer color to peek through - so use a border ring instead, which
-   draws at the card's own edge and isn't covered by child backgrounds.
-   Uses the same --sh-success/--sh-danger/--sh-warning palette as the rest
-   of the theme (softer, desaturated tones) rather than Odoo's raw Bootstrap
-   primitives (#28a745/#900/#e28900), which read as neon against a dark
-   card; .o_dropped uses --sh-text-muted since it's an inactive/archived
-   state, not really a "color" in its own right. */
+/* Build status cards (Builds page): Odoo.sh sets the status color as the
+   card background (`.o_builds_card.o_success{background:#28a745}` etc.),
+   which the `.card` rule above overrides. A background wouldn't show
+   anyway, because the .card-body/.o_card_footer children cover it and
+   content.js makes them opaque and dark. So the status is shown as a border
+   ring at the card's edge instead (content.js tints the children).
+   Uses the theme's softer --sh-success/--sh-danger/--sh-warning tones
+   instead of Odoo's #28a745/#900/#e28900, which look neon on a dark card.
+   .o_dropped uses --sh-text-muted since it's an inactive state. */
 .o_builds_card.o_success {
   border-color: var(--sh-success) !important;
   box-shadow: inset 0 0 0 2px var(--sh-success) !important;
@@ -321,24 +313,23 @@ body .o_tracking_commit.bg-100 {
 body .o_tracking_commit:hover {
   background-color: var(--sh-bg-4) !important;
 }
-/* Short commit hash - text-muted reads too low-contrast here for a monospace
-   identifier people actually need to read, same reasoning as the timestamp fix below. */
+/* Short commit hash: text-muted is too low-contrast for an identifier that
+   needs to be read. */
 body .o_tracking_commit_url { color: var(--sh-text) !important; }
 body .o_tracking_commit_msg { color: var(--sh-text-soft) !important; }
 body .o_tracking_commits_more_link { color: var(--sh-link) !important; }
 
-/* Timestamp ("33 minutes ago", etc.) - was too low-contrast as plain text-muted */
+/* Timestamp ("33 minutes ago", etc.): text-muted is too low-contrast */
 body .o_tracking_info small.text-muted,
 body .o_tracking_info small.text-muted.fw-bold,
 body small.text-muted.fw-bold {
   color: var(--sh-text-soft) !important;
 }
 
-/* The circle/icon marker on each timeline entry: the actual icon glyph
-   (.gi-git-commit) already gets its own dark fill from content.js's generic
-   sweep. Giving this OUTER wrapper a different shade of its own created a
-   visible seam around the icon that read as flanking squares - so leave
-   this one transparent and let the icon's own background be the only fill. */
+/* The circle/icon marker on each timeline entry: the icon glyph
+   (.gi-git-commit) already gets a dark fill from content.js. A separate
+   shade on this wrapper would leave a visible seam around the icon, so it
+   stays transparent. */
 body .o_tracking_stage_change_box {
   background-color: transparent !important;
   border-color: var(--sh-border) !important;
@@ -351,11 +342,9 @@ body .o_sh_tracking_history {
   border-color: var(--sh-border) !important;
   box-shadow: none !important;
 }
-/* The actual connecting line between timeline nodes: Odoo.sh's own CSS is
-   `.o_sh_tracking_history:before{content:""; width:2px; background:#e7e9ed;}`
-   - a real element that needs a background override (not a border), unlike
-   the other pseudo-element selectors this used to also list, none of which
-   have a `content` set anywhere in Odoo's CSS and so never render at all. */
+/* The connecting line between timeline nodes. Odoo.sh draws it with
+   `.o_sh_tracking_history:before{content:""; width:2px; background:#e7e9ed;}`,
+   so it needs a background override, not a border one. */
 body .o_sh_tracking_history::before {
   background-color: var(--sh-border) !important;
   border-color: var(--sh-border) !important;
@@ -365,7 +354,7 @@ body .o_sh_tracking_history::before {
   background-color: #1c7a4d !important;
   border-color: #1c7a4d !important;
 }
-/* "Test: Success" label - the "Test:" part is plain .text-muted, too dim
+/* "Test: Success" label: the "Test:" part is plain .text-muted, too dim
    next to the bright .text-success "Success" beside it. */
 .o_history_status .text-muted { color: var(--sh-text-soft) !important; }
 
@@ -446,10 +435,9 @@ code, pre {
 
 /* ---- Shell tab (JupyterLab-based webshell) -----------------------------
    Served in an <iframe class="o_sh_iframe_tab"> pointing at
-   https://<project>.dev.odoo.com/odoo-sh/webshell - a different host than
-   odoo.sh itself, which manifest.json now also matches (scoped to the
-   /odoo-sh/ path only, so it never touches the actual Odoo app on that
-   same host). */
+   https://<project>.dev.odoo.com/odoo-sh/webshell, a different host than
+   odoo.sh. manifest.json matches it on the /odoo-sh/ path only, so the
+   Odoo app on that same host is never touched. */
 body.jp-ThemedContainer {
   background-color: var(--sh-bg-1) !important;
   color: var(--sh-text) !important;

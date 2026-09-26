@@ -4,7 +4,7 @@
   const btn = document.getElementById("toggle");
 
   function render(enabled) {
-    btn.textContent = enabled ? "Enabled — click to disable" : "Disabled — click to enable";
+    btn.textContent = enabled ? "Enabled, click to disable" : "Disabled, click to enable";
     btn.classList.toggle("on", enabled);
     btn.classList.toggle("off", !enabled);
   }

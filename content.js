@@ -1,20 +1,18 @@
 /**
- * Odoo.sh Dark Mode - dynamic patcher
+ * Odoo.sh Dark Mode: dynamic patcher
  *
- * content.css handles the vast majority of the UI via Odoo.sh's own
- * classes. This script mops up two things CSS alone can't:
+ * content.css handles most of the UI via Odoo.sh's own classes. This
+ * script covers two things CSS alone can't:
  *
- *   1. Elements that get an inline `style="background-color: ...; color: ..."`
- *      set directly by Odoo's JS (rare in the console pages we've seen so
- *      far, but common in embedded widgets like charts/terminals).
- *   2. Content injected after the page has finished loading (tooltips,
- *      dropdown menus, the Monitor/Logs/Shell tabs, which are loaded via
- *      AJAX navigation rather than full page reloads).
+ *   1. Elements with an inline `style="background-color: ...; color: ..."`
+ *      set by Odoo's JS (mostly embedded widgets like charts/terminals).
+ *   2. Content injected after page load (tooltips, dropdown menus, and the
+ *      tabs that are loaded via AJAX navigation instead of a full reload).
  *
- * It also owns the enable/disable toggle exposed by the popup: the
- * stylesheet is loaded here (rather than declared in the manifest) so it
- * can be added/removed live, and every inline-style tweak this script
- * makes is recorded so it can be undone on disable without a reload.
+ * It also owns the popup's enable/disable toggle. The stylesheet is loaded
+ * here instead of in the manifest so it can be added/removed live, and
+ * every inline-style change is recorded so it can be undone on disable
+ * without a reload.
  */
 
 (function () {
@@ -31,9 +29,9 @@
   const STATUS_BG_WARNING = "#3a2a0f";
   const STATUS_BG_DROPPED = "#2b2d33";
   const STATUS_BG_INFO = "#142a38";
-  // Same softened accent colors as content.css's --sh-success/--sh-danger/
-  // --sh-warning/--sh-info (kept as plain hex here too, rather than a var()
-  // reference, so this still works even if content.css fails to load).
+  // Same accent colors as content.css's --sh-success/--sh-danger/
+  // --sh-warning/--sh-info, as plain hex so they work even if content.css
+  // fails to load.
   const STATUS_TEXT_SUCCESS = "#4ade80";
   const STATUS_TEXT_FAILED = "#f87171";
   const STATUS_TEXT_WARNING = "#fbbf24";
@@ -77,9 +75,8 @@
     const link = document.createElement("link");
     link.id = STYLE_ID;
     link.rel = "stylesheet";
-    // Cache-bust: unlike the old manifest-declared css injection, this is a
-    // normal HTTP-cacheable request, so without this the browser can keep
-    // serving a stale content.css across page reloads after an edit.
+    // Cache-bust: this is a normal HTTP-cacheable request, so without it the
+    // browser can keep serving a stale content.css after an edit.
     link.href = chrome.runtime.getURL("content.css") + "?v=" + Date.now();
     (document.head || document.documentElement).appendChild(link);
   }
@@ -112,13 +109,10 @@
     };
   }
 
-  // Thresholds widened after checking Odoo.sh's actual stylesheet: its
-  // default border color (#d8dadd = 216,218,221) fell just short of the old
-  // >220 cutoff, and its default body text color (#374151 = 55,65,81) fell
-  // way short of the old <45 "near black" cutoff, so both were slipping
-  // through unconverted and rendering as low-contrast dark-on-dark or
-  // light-ish-gray-on-dark. The alpha floor was also dropped to catch low-
-  // opacity tints (e.g. a hover background at rgba(0,0,0,0.08)).
+  // Thresholds are set to catch Odoo.sh's default border color
+  // (#d8dadd = 216,218,221) and default body text color (#374151 = 55,65,81).
+  // The low alpha floor also catches faint tints such as a hover background
+  // at rgba(0,0,0,0.08).
   function isNearWhite(rgb) {
     return !!rgb && rgb.a > 0.05 && rgb.r > 200 && rgb.g > 200 && rgb.b > 200;
   }
@@ -127,10 +121,9 @@
     return !!rgb && rgb.a > 0.05 && rgb.r < 100 && rgb.g < 100 && rgb.b < 100;
   }
 
-  // Inline styles set directly via JS (e.g. by chart/terminal widgets) that
-  // getComputedStyle-based CSS overrides can't reach, since an inline
-  // style attribute wins over an external stylesheet unless we also mark
-  // ours !important, which we do here.
+  // Inline styles set via JS (e.g. by chart/terminal widgets). An inline
+  // style attribute beats an external stylesheet, so these are overridden
+  // with inline !important values.
   function fixInlineStyle(el) {
     const style = el.style;
     if (!style || !style.length) return;
@@ -153,10 +146,9 @@
     });
   }
 
-  // Catches leftover near-white/near-black colors coming from the page's
-  // own stylesheet that our class-based overrides in content.css didn't
-  // anticipate (e.g. an unfamiliar widget on a page we haven't mapped yet).
-  // Applied as an inline !important override, which always wins.
+  // Catches near-white/near-black colors from the page's own stylesheet
+  // that the class-based rules in content.css don't cover (e.g. a widget on
+  // an unmapped page). Applied as an inline !important override.
   function fixComputedStyle(el) {
     if (SKIP_TAGS.has(el.tagName)) return;
     const cs = window.getComputedStyle(el);
@@ -171,36 +163,27 @@
       trackAndSet(el, "color", LIGHT_TEXT, "important");
     }
 
-    // Gating this on border-top-width used to skip the whole check for any
-    // element whose top border happens to be 0 - which Bootstrap does on
-    // purpose for adjacent .list-group-item siblings (border-top-width: 0,
-    // to merge borders between rows), even though their left/right/bottom
-    // borders are still full-width and the same near-white color. Setting
-    // border-color when a side's width is actually 0 is harmless (nothing
-    // renders there either way), so just always fix the color.
+    // Not gated on border width: Bootstrap sets border-top-width: 0 on
+    // adjacent .list-group-item rows while their other sides still have a
+    // near-white border. Setting a color on a zero-width side is harmless.
     const borderColor = parseRGB(cs.borderTopColor);
     if (isNearWhite(borderColor)) {
       trackAndSet(el, "border-color", DARK_BORDER, "important");
     }
   }
 
-  // Hand-picked overrides, confirmed against Odoo.sh's actual shipped
-  // stylesheet (paas_master.paas_app_assets.min.css) rather than guessed:
-  //   - .o_branches_searchbar_icon (the icon's own container div, not the
-  //     <i> inside it) gets an explicit background-color: #22262C from
-  //     Odoo's own CSS - a dark-but-not-near-white/black shade our generic
-  //     sweep would never flag, which read as a mismatched "square" once
-  //     everything around it went to our own dark palette.
-  //   - .o_sh_tracking_icon .gi gets color: #9a9ca5 from a rule that
-  //     targets the icon element directly; a color set on an ancestor
-  //     (e.g. .o_tracking_stage_change_box) only cascades by inheritance,
-  //     which any direct same-element rule beats regardless of specificity.
-  //   - .o_tracking_commit_url has no rule of its own in Odoo's CSS at all,
-  //     so this is just belt-and-suspenders over the content.css rule.
-  // Applied as inline styles via trackAndSet, which always wins over any
-  // external stylesheet regardless of that stylesheet's specificity or
-  // !important - and works even if content.css fails to load, since these
-  // values are hardcoded here rather than referencing its CSS variables.
+  // Targeted overrides, based on Odoo.sh's shipped stylesheet
+  // (paas_master.paas_app_assets.min.css):
+  //   - .o_branches_searchbar_icon (the container div, not the <i> inside)
+  //     has background-color: #22262C, a shade the generic sweep doesn't
+  //     flag, which shows up as a mismatched square on the dark palette.
+  //   - .o_sh_tracking_icon .gi has color: #9a9ca5 set on the icon itself,
+  //     so a color on an ancestor can't override it by inheritance.
+  //   - .o_tracking_commit_url has no rule in Odoo's CSS; this backs up the
+  //     content.css rule.
+  // Applied as inline styles via trackAndSet, which beat any external
+  // stylesheet. The values are hardcoded so they work even if content.css
+  // fails to load.
   const FORCED_STYLES = [
     [".o_branches_searchbar_icon", { "background-color": "transparent" }],
     [".o_branches_searchbar_icon i", { "background-color": "transparent", color: BRIGHT_TEXT }],
@@ -213,16 +196,12 @@
     [".o_tracking_stage_change_box", { "box-shadow": "none" }],
     [".o_tracking_commit", { "box-shadow": "none", "border-color": DARK_BORDER }],
     [".o_tracking_commit i.gi-git-commit", { color: BRIGHT_TEXT, "background-color": "transparent" }],
-    // Build status cards (Builds page): Odoo.sh's own status color
-    // (.o_builds_card.o_success{background:#28a745} etc.) lives on the
-    // OUTER card, but its .card-body/.o_card_footer children fully cover
-    // it edge-to-edge with their own background - which itself gets
-    // forced dark by this same script's generic sweep (fixComputedStyle),
-    // via an inline style that no CSS rule could ever out-rank. So a
-    // content.css fix can only ever color a background nobody sees; this
-    // has to recolor the actual visible children, here, after the generic
-    // sweep has already run (FORCED_STYLES entries apply last per element,
-    // see sweep() below), so this wins the "last write" and sticks.
+    // Build status cards (Builds page): Odoo.sh puts the status color
+    // (.o_builds_card.o_success{background:#28a745} etc.) on the outer card,
+    // but the .card-body/.o_card_footer children cover it completely, and
+    // the generic sweep forces their background dark with an inline style.
+    // So the visible children are tinted here instead. FORCED_STYLES apply
+    // after the generic sweep for each element (see sweep()), so they win.
     [".o_builds_card.o_success .card-body", { "background-color": STATUS_BG_SUCCESS }],
     [".o_builds_card.o_success .o_card_footer", { "background-color": STATUS_BG_SUCCESS }],
     [".o_builds_card.o_failed .card-body", { "background-color": STATUS_BG_FAILED }],
@@ -231,15 +210,12 @@
     [".o_builds_card.o_warning .o_card_footer", { "background-color": STATUS_BG_WARNING }],
     [".o_builds_card.o_dropped .card-body", { "background-color": STATUS_BG_DROPPED }],
     [".o_builds_card.o_dropped .o_card_footer", { "background-color": STATUS_BG_DROPPED }],
-    // Bootstrap 5.3 "subtle" alert tokens (e.g. .alert-success's --alert-bg
-    // resolves to #d4edda, a pastel green) are pastel-but-still-near-white,
-    // so the generic sweep correctly but unhelpfully flattens every alert
-    // variant (success/danger/warning/info) to the same plain dark - same
-    // failure mode as the build cards, fixed the same way. The "* " entries
-    // are needed because descendants (the check icon, the message text)
-    // each get their own independent near-black-text fix from the generic
-    // sweep too, as plain neutral gray, overriding what they'd otherwise
-    // have inherited from the parent's color here.
+    // Alerts: Bootstrap 5.3's "subtle" alert backgrounds (e.g. #d4edda for
+    // .alert-success) count as near-white, so the generic sweep would turn
+    // every variant the same plain dark. Handled like the build cards. The
+    // "*" entries are needed because the sweep also gives descendants (icon,
+    // message text) their own neutral gray, which would hide the parent's
+    // color.
     [".alert-success", { "background-color": STATUS_BG_SUCCESS, color: STATUS_TEXT_SUCCESS }],
     [".alert-success *", { color: STATUS_TEXT_SUCCESS }],
     [".alert-danger", { "background-color": STATUS_BG_FAILED, color: STATUS_TEXT_FAILED }],
@@ -287,11 +263,10 @@
   }
 
   // Odoo.sh's tabs (History / Shell / Monitor / Logs / ...) and tooltips /
-  // dropdowns are injected dynamically without a full navigation, so keep
-  // watching for new nodes. We only react to added nodes (not attribute
-  // changes), so our own style.setProperty calls above never re-trigger
-  // this observer - no infinite loop risk. Kept observing even while
-  // disabled (cheap) so re-enabling doesn't need a page reload.
+  // dropdowns are injected without a full navigation, so keep watching for
+  // new nodes. Only added nodes are observed (not attribute changes), so
+  // the style.setProperty calls above never re-trigger the observer. It
+  // keeps running while disabled so re-enabling doesn't need a reload.
   let pending = false;
   const observer = new MutationObserver((mutations) => {
     if (!enabled || pending) return;

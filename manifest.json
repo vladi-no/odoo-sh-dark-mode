@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Odoo.sh Dark Mode",
   "version": "1.2.0",
-  "description": "A hand-tuned dark theme for the Odoo.sh management console (Branches, Builds, Monitor, Logs, Shell, Settings).",
+  "description": "A hand-tuned dark theme for the Odoo.sh management console (Branches, Builds, Settings, Status, Shell).",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
