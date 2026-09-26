@@ -50,7 +50,7 @@ own enable/disable state for the extension itself.
 ## Out of scope
 
 **Monitor**, **Logs**, **Backups**, **Upgrade** and **Tools** are not
-covered, since they aren't used.
+covered, since they did not need dark mode (already dark).
 
 To add a page later, save it in Chrome with **File → Save Page As → Webpage,
 Complete** (not just "copy outerHTML"). That keeps the linked CSS/JS files
